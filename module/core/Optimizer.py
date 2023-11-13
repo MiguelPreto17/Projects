@@ -40,7 +40,7 @@ class Optimizer:
 		# **************************************************************************************************************
 		#         MILP PARAMETERS: OTHER
 		# **************************************************************************************************************
-		self.milp = None  # stores the entire MILP problem (variables, objective function, restrictions and results)
+		self.milp = 0  # stores the entire MILP problem (variables, objective function, restrictions and results)
 		self.opt_val = None  # stores the milp numeric solution
 		self.stat = None  # stores the status of the milp solution
 		self.varis = None  # Dictionary to store all output variables values
@@ -95,7 +95,6 @@ class Optimizer:
 		init_dt = milp_params.get('init')
 		self.step_in_min = milp_params.get('step')
 		self.step_in_hours = milp_params.get('step') / minutes_in_hour
-		#self.step_in_days = milp_params.get('step') / hours_in_day
 		self.step_in_seconds = self.step_in_min * seconds_in_min
 		self.time_intervals = int(self.horizon/self.step_in_hours)
 		self.time_series = range(self.time_intervals)
@@ -117,10 +116,11 @@ class Optimizer:
 
 
 		# Parse forecasts
-		self.pv_forecasts = forecasts.get('pvForecasts')
+		#self.pv_forecasts = forecasts.get('pvForecasts')
 		self.load_forecasts = forecasts.get('loadForecasts')
 		self.market_prices = forecasts.get('marketPrices')
-		self.feedin_tariffs = forecasts.get('feedinTariffs')
+		#self.feedin_tariffs = forecasts.get('feedinTariffs')
+
 
 	def solve_milp(self, a):
 		"""
@@ -256,15 +256,13 @@ class Optimizer:
 		#        OBJECTIVE FUNCTION
 		# **************************************************************************************************************
 		# Eq. (1)
-		#self.milp += lpSum(p_abs[t] * self.market_prices[t] + e_deg[t] + e_deg2[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
+		# self.milp += lpSum(p_abs[t] * self.market_prices[t] + e_deg[t] + e_deg2[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
 		#self.milp += lpSum(p_abs[t] * self.market_prices[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
 
 		if a == "A":
-			self.milp += lpSum(p_abs[t] * self.market_prices[t] + k1 * e_deg[t] + k2 * e_deg2[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
+			self.milp += lpSum((p_abs[t] * self.market_prices[t] + k1 * e_deg[t] + k2 * e_deg2[t]) for t in self.time_series) * self.step_in_hours, 'Objective Function'
 		else:
-			#if a == "B" :
-		#elif a == "B":
-			self.milp += lpSum(p_abs[t] * self.market_prices[t] + C1 * e_deg[t] + C2 * e_deg2[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
+			self.milp += lpSum((p_abs[t] * self.market_prices[t] + C1 * e_deg[t] + C2 * e_deg2[t]) for t in self.time_series) * self.step_in_hours, 'Objective Function'
 
 		#self.milp += lpSum(p_abs[t] * self.market_prices[t] - p_inj[t] * self.feedin_tariffs[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
 
@@ -282,7 +280,8 @@ class Optimizer:
 				bess_flows2 = lpSum((p_ch2[s][t] - p_disch2[s][t]) for s in S)
 
 			#  -- define the liquid consumption as load - generation (without bess flows)
-			generation_and_demand = (self.load_forecasts[t] - self.pv_forecasts[t])
+			#generation_and_demand = (self.load_forecasts[t] - self.pv_forecasts[t])
+			generation_and_demand = self.load_forecasts[t]
 			self.milp += p_abs[t] == bess_flows + bess_flows2 + generation_and_demand, f'Equilibrium_{t:03d}'
 			#self.milp += p_abs[t] - p_inj[t] == bess_flows + bess_flows2 + generation_and_demand, f'Equilibrium_{t:03d}'
 
