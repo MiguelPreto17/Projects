@@ -5,3 +5,5 @@ outputs/
 docs/
 Files/
 
+interstore/
+__pycache__/
