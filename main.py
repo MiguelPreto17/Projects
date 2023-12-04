@@ -1,10 +1,4 @@
-import datetime as dt
-import itertools
-import numpy as np
-import os
 import pandas as pd
-import sys
-from copy import deepcopy
 from helpers.set_loggers import *
 from module.core.Optimizer import Optimizer
 from settings.general_settings import GeneralSettings
@@ -46,7 +40,6 @@ def read_data(step, table_data):
 
 	return data
 
-
 def optimize(_settings, _assets, _assets2, _milp_params, _measures, _measures2, _forecasts, a):
 	"""
 	Main optimization orchestrator.
@@ -87,12 +80,10 @@ HELPERS_PATH = os.path.join(ROOT_PATH, 'helpers')
 set_stdout_logger()
 logfile_handler_id = set_logfile_handler()
 
-
 # Create a variable to store the setpoints
 daily_outputs = None
 # Create a variable to store the main results
 final_outputs = None
-
 
 expected_revenues = 0
 last_soc = 0

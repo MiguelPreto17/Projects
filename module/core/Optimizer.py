@@ -122,14 +122,14 @@ class Optimizer:
 		#self.feedin_tariffs = forecasts.get('feedinTariffs')
 
 
-	def solve_milp(self, a):
+	def solve_milp(self, objective_function):
 		"""
 		Function that heads the definition and solution of the optimization problem.
 		:return: None
 		:rtype: None
 		"""
 		logger.debug(' - defining MILP')
-		self.milp = self.__define_milp(a)
+		self.milp = self.__define_milp(objective_function)
 
 		logger.debug(' - actually solving MILP')
 		# noinspection PyBroadException
@@ -146,7 +146,7 @@ class Optimizer:
 		self.stat = stat
 		self.opt_val = opt_val
 
-	def __define_milp(self, a):
+	def __define_milp(self, objective_function):
 		"""
 		Method to define the generic MILP problem.
 		:return: object with the milp problem ready for solving and easy access to all parameters, variables and results
@@ -259,7 +259,7 @@ class Optimizer:
 		# self.milp += lpSum(p_abs[t] * self.market_prices[t] + e_deg[t] + e_deg2[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
 		#self.milp += lpSum(p_abs[t] * self.market_prices[t] for t in self.time_series) * self.step_in_hours, 'Objective Function'
 
-		if a == "A":
+		if objective_function == "A":
 			self.milp += lpSum((p_abs[t] * self.market_prices[t] + k1 * e_deg[t] + k2 * e_deg2[t]) for t in self.time_series) * self.step_in_hours, 'Objective Function'
 		else:
 			self.milp += lpSum((p_abs[t] * self.market_prices[t] + C1 * e_deg[t] + C2 * e_deg2[t]) for t in self.time_series) * self.step_in_hours, 'Objective Function'
@@ -456,7 +456,7 @@ class Optimizer:
 
 		return self.milp
 
-	def generate_outputs(self, a):
+	def generate_outputs(self, objective_function):
 		"""
 		Function for generating the outputs of optimization, namely the set points for each asset and all relevant
 		variables, and to convert them into JSON format.
@@ -468,7 +468,7 @@ class Optimizer:
 			self.outputs = {}
 		else:
 			self.__get_variables_values()
-			self.__initialize_and_populate_outputs(a)
+			self.__initialize_and_populate_outputs(objective_function)
 
 		# Generate the outputs JSON file
 		master_path = os.path.abspath(os.path.join(__file__, '..', '..', '..'))
@@ -653,7 +653,7 @@ class Optimizer:
 
 					elif re.search(f'delta_bess_disch2_{s}_', v.name) and self.add_on_inv:
 						self.varis[f'delta_bess_disch2'][s][t] = v.varValue
-	def __initialize_and_populate_outputs(self, a):
+	def __initialize_and_populate_outputs(self, objective_function):
 		"""
 		Initializes and populates the outputs' structure as a dictionary matching the outputs JSON format.
 		:return: None
@@ -685,19 +685,14 @@ class Optimizer:
 		of = (pcc_absorption * self.market_prices ) * self.step_in_hours
 
 
-		if a == "A":
+		if objective_function == "A":
 			totdeg = k1 * edeg + k2 * edeg2
 		else:
-		#elif a == "B":
 			totdeg = C1 * edeg + C2 * edeg2
-		#else:
-			#print("ERRO")
 		tot = of + totdeg
 		#merge = p_ch - p_disch
 		merge = np.array(self.varis.get('p_ch')) - np.array(self.varis.get('p_disch'))
-
-
-		#of = (pcc_absorption * self.market_prices - pcc_injection * self.feedin_tariffs) * self.step_in_hours
+		merge2 = np.array(self.varis.get('p_ch2')) - np.array(self.varis.get('p_disch2'))
 
 		#Initialize outputs as a dictionary
 		self.outputs = dict(
@@ -711,12 +706,11 @@ class Optimizer:
 			eBess2=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, self.varis.get('e_bess2'))],
 			eDeg2=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, self.varis.get('e_deg2'))],
 			pAbs=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, self.varis.get('p_abs'))],
-			#pInj=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, self.varis.get('p_inj'))],
 			expectRevs=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, of)],
 			Totaldeg=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, totdeg)],
 			Total=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, tot)],
 			Merge=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, merge)],
-
+			Merge2=[{'datetime': dt, 'setpoint': val} for dt, val in zip(list_of_dates, merge2)],
 
 		)
 
