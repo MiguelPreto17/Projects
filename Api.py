@@ -8,7 +8,7 @@ from settings.general_settings import GeneralSettings
 from time import time
 from copy import deepcopy
 from helpers.set_loggers import *
-# import uvicorn
+
 
 app = FastAPI(
     title="interstore api",
@@ -40,19 +40,20 @@ async def objective_function(selected_option: str = Form(...)):
 
 
 @app.post("/api/settings")
-async def settings(input1: float = Form(...), input2: float = Form(...), input3: float = Form(...), input4: float = Form(...), input5: float = Form(...), input6: float = Form(...), input7: float = Form(...), input8: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):
+async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), e_nom: float = Form(...), technology: float = Form(...), max_c_ch2: float = Form(...), max_c_disch2: float = Form(...), e_nom2: float = Form(...), technology2: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):
+
     # Parametros
     objective_function = selected_option
 
-    GeneralSettings.bess_max_c_ch = input1
-    GeneralSettings.bess_max_c_disch = input2
-    GeneralSettings.bess_e_nom = input3
-    GeneralSettings.bess_deg_curve = input4
+    GeneralSettings.bess_max_c_ch = max_c_ch
+    GeneralSettings.bess_max_c_disch = max_c_disch
+    GeneralSettings.bess_e_nom = e_nom
+    GeneralSettings.technology = technology
 
-    GeneralSettings.bess_max_c_ch2 = input5
-    GeneralSettings.bess_max_c_disch2 = input6
-    GeneralSettings.bess_e_nom2 = input7
-    GeneralSettings.bess_deg_curve2 = input8
+    GeneralSettings.bess_max_c_ch2 = max_c_ch2
+    GeneralSettings.bess_max_c_disch2 = max_c_disch2
+    GeneralSettings.bess_e_nom2 = e_nom2
+    GeneralSettings.technology2 = technology2
 
     # Converter a string de data em um objeto datetime
     table_data = pd.DataFrame(

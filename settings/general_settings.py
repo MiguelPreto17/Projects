@@ -51,7 +51,8 @@ class GeneralSettings:
     bess_min_soc = 0.0  # minimum SoC [%]
     bess_reserve_soc = 0.0    # reserve SoC [%] (becomes minimum SoC if > bess_min_soc)
     bess_v_nom = 720.0  # nominal voltage [V]
-    bess_deg_curve = 1
+    #bess_deg_curve = 1
+    technology = 1
 
 
     bess_max_c_ch2 = 0.0 # maximum C-rate for charging [0, 1]
@@ -70,7 +71,8 @@ class GeneralSettings:
     bess_min_soc2 = 0.0  # minimum SoC [%]
     bess_reserve_soc2 = 0.0  # reserve SoC [%] (becomes minimum SoC if > bess_min_soc)
     bess_v_nom2 = 720.0  # nominal voltage [V]
-    bess_deg_curve2 = 2
+    technology2 = 2
+    #bess_deg_curve2 = 2
 
 
 
@@ -191,7 +193,7 @@ class GeneralSettings:
         {"nrCycles": 20000, "dod": 100.0}
     ]
 
-    if bess_deg_curve == 1:
+    if technology == 1:
         #bess_deg_curve = bess_deg_curve1
         bess_deg_curve = bess_deg_curve_lithium
         bess_ch_eff = 95
@@ -202,7 +204,7 @@ class GeneralSettings:
 
 
     else:
-        if bess_deg_curve == 2:
+        if technology == 2:
             bess_deg_curve = bess_deg_curve_Vanadium
             bess_ch_eff = 75
             bess_disch_eff = 75
@@ -211,42 +213,42 @@ class GeneralSettings:
             #C1 = 0.385
 
 
-        if bess_deg_curve == 3:
+        if technology == 3:
             bess_deg_curve = bess_deg_curve_Lead_Acid
             bess_ch_eff = 75
             bess_disch_eff = 75
             k1 = 437
             C1 = 455
 
-        if bess_deg_curve == 4:
+        if technology == 4:
             bess_deg_curve = bess_deg_curve_NiCd
             bess_ch_eff = 60
             bess_disch_eff = 60
             k1 = 699
             C1 = 1
 
-        if bess_deg_curve == 5:
+        if technology == 5:
             bess_deg_curve = bess_deg_curve_NaS
             bess_ch_eff = 80
             bess_disch_eff = 80
             K1 = 343
             C1 = 569
 
-        if bess_deg_curve == 6:
+        if technology == 6:
             bess_deg_curve = bess_deg_curve_Flywheel
             bess_ch_eff = 93
             bess_disch_eff = 93
             K1 = 4791
             C1 = 159
 
-        if bess_deg_curve == 7:
+        if technology == 7:
             bess_deg_curve = bess_deg_curve_Supercaps
             bess_ch_eff = 95
             bess_disch_eff = 95
             k1 = 765
             C1= 416
 
-    if bess_deg_curve2 == 1:
+    if technology2 == 1:
         bess_deg_curve2 = bess_deg_curve_lithium
         bess_ch_eff2 = 85
         bess_disch_eff2 = 85
@@ -254,14 +256,14 @@ class GeneralSettings:
         C2 = 297
 
     else:
-        if bess_deg_curve2 == 2:
+        if technology2 == 2:
             bess_deg_curve2 = bess_deg_curve_Vanadium
             bess_ch_eff2 = 85
             bess_disch_eff2 = 85
             k2 = 307
             C2 = 165.5
 
-        if bess_deg_curve2 == 3:
+        if technology2 == 3:
             bess_deg_curve2 = bess_deg_curve_Lead_Acid
             bess_ch_eff2 = 75
             bess_disch_eff2 = 75
@@ -269,28 +271,28 @@ class GeneralSettings:
             C2 = 455
 
 
-        if bess_deg_curve2 == 4:
+        if technology2 == 4:
             bess_deg_curve2 = bess_deg_curve_NiCd
             bess_ch_eff2 = 60
             bess_disch_eff2 = 60
             k2 = 699
             C2 = 1
 
-        if bess_deg_curve2 == 5:
+        if technology2 == 5:
             bess_deg_curve2 = bess_deg_curve_NaS
             bess_ch_eff2 = 80
             bess_disch_eff2 = 80
             k2 = 343
             C2 = 569
 
-        if bess_deg_curve2 == 6:
+        if technology2 == 6:
             bess_deg_curve2 = bess_deg_curve_Flywheel
             bess_ch_eff2 = 93
             bess_disch_eff2 = 93
             k2 = 4791
             C2 = 159
 
-        if bess_deg_curve2 == 7:
+        if technology2 == 7:
             bess_deg_curve2 = bess_deg_curve_Supercaps
             bess_ch_eff2 = 95
             bess_disch_eff2 = 95
