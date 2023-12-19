@@ -39,11 +39,28 @@ async def objective_function(selected_option: str = Form(...)):
     return objective_function
 
 
+"""@app.post("/api/settings")
+async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), e_nom: float = Form(...), technology: float = Form(...), max_c_ch2: float = Form(...), max_c_disch2: float = Form(...), e_nom2: float = Form(...), technology2: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):"""
 @app.post("/api/settings")
-async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), e_nom: float = Form(...), technology: float = Form(...), max_c_ch2: float = Form(...), max_c_disch2: float = Form(...), e_nom2: float = Form(...), technology2: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):
+async def settings(data: dict):
+    selected_option = data.get("selected_option")
+    load = data.get("load", [])
+    market = data.get("market", [])
+    date = data.get("date", [])
+
+    max_c_ch = data.get("max_c_ch")
+    max_c_disch = data.get("max_c_disch")
+    e_nom = data.get("e_nom")
+    technology = data.get("technology")
+
+    max_c_ch2 = data.get("max_c_ch2")
+    max_c_disch2 = data.get("max_c_disch2")
+    e_nom2 = data.get("e_nom2")
+    technology2 = data.get("technology2")
 
     # Parametros
     objective_function = selected_option
+
 
     GeneralSettings.bess_max_c_ch = max_c_ch
     GeneralSettings.bess_max_c_disch = max_c_disch
@@ -191,7 +208,7 @@ async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), 
 
         # -- if first day, create df, else append to existing df
         if main.daily_outputs is not None:
-            main.daily_outputs = main.daily_outputs.append(df)
+            main.daily_outputs = main.daily_outputs_append(df)
         else:
             main.daily_outputs = df
 
