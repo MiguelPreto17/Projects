@@ -52,25 +52,33 @@ async def settings(data: dict):
     max_c_disch = data.get("max_c_disch")
     e_nom = data.get("e_nom")
     technology = data.get("technology")
+    bess_ch_eff = data.get("bess_ch_eff")
+    bess_disch_eff = data.get("bess_disch_eff")
+
 
     max_c_ch2 = data.get("max_c_ch2")
     max_c_disch2 = data.get("max_c_disch2")
     e_nom2 = data.get("e_nom2")
     technology2 = data.get("technology2")
+    bess_ch_eff2 = data.get("bess_ch_eff2")
+    bess_disch_eff2 = data.get("bess_disch_eff2")
 
     # Parametros
     objective_function = selected_option
-
 
     GeneralSettings.bess_max_c_ch = max_c_ch
     GeneralSettings.bess_max_c_disch = max_c_disch
     GeneralSettings.bess_e_nom = e_nom
     GeneralSettings.technology = technology
+    GeneralSettings.bess_ch_eff = bess_ch_eff
+    GeneralSettings.bess_disch_eff = bess_disch_eff
 
     GeneralSettings.bess_max_c_ch2 = max_c_ch2
     GeneralSettings.bess_max_c_disch2 = max_c_disch2
     GeneralSettings.bess_e_nom2 = e_nom2
     GeneralSettings.technology2 = technology2
+    GeneralSettings.bess_ch_eff2 = bess_ch_eff2
+    GeneralSettings.bess_disch_eff2 = bess_disch_eff2
 
     # Converter a string de data em um objeto datetime
     table_data = pd.DataFrame(
@@ -207,10 +215,12 @@ async def settings(data: dict):
             df = aux_df if i == 0 else df.join(aux_df)
 
         # -- if first day, create df, else append to existing df
-        if main.daily_outputs is not None:
+        """if main.daily_outputs is not None:
             main.daily_outputs = main.daily_outputs_append(df)
         else:
             main.daily_outputs = df
+"""
+        main.daily_outputs = df
 
         status = prob_obj.stat
         logger.warning(f'{status}')
@@ -256,13 +266,15 @@ async def settings(data: dict):
                                             sep=';', decimal=',', index=True)
 
     # Remove the log file handler
-    remove_logfile_handler(main.logfile_handler_id)
+    #remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
 
 
 @app.get("/api/get_data_for_chart")
 async def get_data_for_chart():
-    return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs
+    technology = GeneralSettings.technology
+    technology2 = GeneralSettings.technology2
+    return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs, technology, technology2
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="127.0.0.1", port=8000)

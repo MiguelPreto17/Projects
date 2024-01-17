@@ -74,8 +74,6 @@ class GeneralSettings:
     technology2 = 2
     #bess_deg_curve2 = 2
 
-
-
     """bess_deg_curve1 = [
                             {"nrCycles": 10000000, "dod": 1.0},
                             {"nrCycles": 900000, "dod": 5.0},
@@ -201,7 +199,6 @@ class GeneralSettings:
         k1 = 546
         C1 = 297
         #C1 = 0.300
-
 
     else:
         if technology == 2:
