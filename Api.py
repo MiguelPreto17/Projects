@@ -18,9 +18,9 @@ app = FastAPI(
 
 # Configuração do CORS
 origins = [
-    "http://127.0.0.1:3006",
+    "http://127.0.0.1:3000",
     "http://localhost",
-    "http://localhost:3006",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -41,6 +41,8 @@ async def objective_function(selected_option: str = Form(...)):
 
 """@app.post("/api/settings")
 async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), e_nom: float = Form(...), technology: float = Form(...), max_c_ch2: float = Form(...), max_c_disch2: float = Form(...), e_nom2: float = Form(...), technology2: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):"""
+
+
 @app.post("/api/settings")
 async def settings(data: dict):
     selected_option = data.get("selected_option")
@@ -215,11 +217,10 @@ async def settings(data: dict):
             df = aux_df if i == 0 else df.join(aux_df)
 
         # -- if first day, create df, else append to existing df
-        """if main.daily_outputs is not None:
-            main.daily_outputs = main.daily_outputs_append(df)
-        else:
-            main.daily_outputs = df
-"""
+        # if main.daily_outputs is not None:
+        #     main.daily_outputs = main.daily_outputs_append(df)
+        # else:
+        #     main.daily_outputs = df
         main.daily_outputs = df
 
         status = prob_obj.stat
@@ -260,13 +261,17 @@ async def settings(data: dict):
         logger.info(
             f' * Day {iteration} of {total_iter} ... OK! ({iter_time - time():.3f}s) * ')
 
+    # Save the outputs to a csv file
+    # TODO: create a folder for the outputs if non existent
+    # dir = os.path.join(ROOT_PATH, 'outputs')
+
     main.daily_outputs.to_csv(rf'outputs/{prob_obj.common_fname}_setpoints.csv',
                               sep=';', decimal=',', index=True)
     pd.DataFrame(main.final_outputs).to_csv(rf'outputs/{prob_obj.common_fname}_main_outputs.csv',
                                             sep=';', decimal=',', index=True)
 
     # Remove the log file handler
-    #remove_logfile_handler(main.logfile_handler_id)
+    # remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
 
 
