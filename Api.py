@@ -54,16 +54,15 @@ async def settings(data: dict):
     max_c_disch = data.get("max_c_disch")
     e_nom = data.get("e_nom")
     technology = data.get("technology")
-    bess_ch_eff = data.get("bess_ch_eff")
-    bess_disch_eff = data.get("bess_disch_eff")
-
+    bess_ch_eff = data.get("ch_eff")
+    bess_disch_eff = data.get("disch_eff")
 
     max_c_ch2 = data.get("max_c_ch2")
     max_c_disch2 = data.get("max_c_disch2")
     e_nom2 = data.get("e_nom2")
     technology2 = data.get("technology2")
-    bess_ch_eff2 = data.get("bess_ch_eff2")
-    bess_disch_eff2 = data.get("bess_disch_eff2")
+    bess_ch_eff2 = data.get("ch_eff2")
+    bess_disch_eff2 = data.get("disch_eff2")
 
     # Parametros
     objective_function = selected_option

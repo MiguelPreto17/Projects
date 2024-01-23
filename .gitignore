@@ -1,9 +1,9 @@
+**__pycache__/
 API/
-APP/
+app/
 logs/
 outputs/
 docs/
 Files/
-
 interstore/
-__pycache__/
+outputs.json
