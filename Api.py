@@ -31,17 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/api/objective_function")
 async def objective_function(selected_option: str = Form(...)):
 
     objective_function = selected_option
     return objective_function
-
-
-"""@app.post("/api/settings")
-async def settings(max_c_ch: float = Form(...), max_c_disch: float = Form(...), e_nom: float = Form(...), technology: float = Form(...), max_c_ch2: float = Form(...), max_c_disch2: float = Form(...), e_nom2: float = Form(...), technology2: float = Form(...), selected_option: str = Form(...), date: list = Form(...), market: list[float] = Form(...), load: list[float] = Form(...)):"""
-
 
 @app.post("/api/settings")
 async def settings(data: dict):
@@ -50,20 +44,21 @@ async def settings(data: dict):
     market = data.get("market", [])
     date = data.get("date", [])
 
-    max_c_ch = data.get("max_c_ch")
-    max_c_disch = data.get("max_c_disch")
-    e_nom = data.get("e_nom")
+    Power = data.get("Power")
+    e_nom = data.get("Capacity")
     technology = data.get("technology")
-    bess_ch_eff = data.get("bess_ch_eff")
-    bess_disch_eff = data.get("bess_disch_eff")
+    max_c_ch = Power / e_nom
+    max_c_disch = Power / e_nom
+    bess_ch_eff = data.get("Eficiency")
+    bess_disch_eff = data.get("Eficiency")
 
-
-    max_c_ch2 = data.get("max_c_ch2")
-    max_c_disch2 = data.get("max_c_disch2")
-    e_nom2 = data.get("e_nom2")
+    Power2 = data.get("Power2")
+    e_nom2 = data.get("Capacity2")
     technology2 = data.get("technology2")
-    bess_ch_eff2 = data.get("bess_ch_eff2")
-    bess_disch_eff2 = data.get("bess_disch_eff2")
+    max_c_ch2 = Power2 / e_nom2
+    max_c_disch2= Power2 / e_nom2
+    bess_ch_eff2 = data.get("Eficiency2")
+    bess_disch_eff2= data.get("Eficiency2")
 
     # Parametros
     objective_function = selected_option
@@ -74,6 +69,7 @@ async def settings(data: dict):
     GeneralSettings.technology = technology
     GeneralSettings.bess_ch_eff = bess_ch_eff
     GeneralSettings.bess_disch_eff = bess_disch_eff
+    GeneralSettings.bess_inv_s_nom = max_c_ch * e_nom
 
     GeneralSettings.bess_max_c_ch2 = max_c_ch2
     GeneralSettings.bess_max_c_disch2 = max_c_disch2
@@ -81,6 +77,79 @@ async def settings(data: dict):
     GeneralSettings.technology2 = technology2
     GeneralSettings.bess_ch_eff2 = bess_ch_eff2
     GeneralSettings.bess_disch_eff2 = bess_disch_eff2
+    GeneralSettings.bess_inv_s_nom2 = max_c_ch2 * e_nom2
+
+    if technology == 1:
+        GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_lithium
+        GeneralSettings.k1 = 546
+        GeneralSettings.C1 = 297
+
+    else:
+        if technology == 2:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Vanadium
+            GeneralSettings.k1 = 307
+            GeneralSettings.C1 = 165.5
+
+        if technology == 3:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Lead_Acid
+            GeneralSettings.k1 = 437
+            GeneralSettings.C1 = 455
+
+        if technology == 4:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_NiCd
+            GeneralSettings.k1 = 699
+            GeneralSettings.C1 = 1
+
+        if technology == 5:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_NaS
+            GeneralSettings.k1 = 343
+            GeneralSettings.C1 = 569
+
+        if technology == 6:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Flywheel
+            GeneralSettings.k1 = 4791
+            GeneralSettings.C1 = 159
+
+        if technology == 7:
+            GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Supercaps
+            GeneralSettings.k1 = 765
+            GeneralSettings.C1 = 416
+
+    if technology2 == 1:
+        GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_lithium
+        GeneralSettings.k2 = 546
+        GeneralSettings.C2 = 297
+
+    else:
+        if technology2 == 2:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_Vanadium
+            GeneralSettings.k2 = 307
+            GeneralSettings.C2 = 165.5
+
+        if technology2 == 3:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_Lead_Acid
+            GeneralSettings.k2 = 437
+            GeneralSettings.C2 = 455
+
+        if technology2 == 4:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_NiCd
+            GeneralSettings.k2 = 699
+            GeneralSettings.C2 = 1
+
+        if technology2 == 5:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_NaS
+            GeneralSettings.K2 = 343
+            GeneralSettings.C2 = 569
+
+        if technology2 == 6:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_Flywheel
+            GeneralSettings.K2 = 4791
+            GeneralSettings.C2 = 159
+
+        if technology2 == 7:
+            GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_Supercaps
+            GeneralSettings.k2 = 765
+            GeneralSettings.C2 = 416
 
     # Converter a string de data em um objeto datetime
     table_data = pd.DataFrame(
@@ -155,6 +224,8 @@ async def settings(data: dict):
             'reserveSoc': GeneralSettings.bess_reserve_soc,
             'testData': GeneralSettings.bess_test_data,
             'vNom': GeneralSettings.bess_v_nom,
+            'K1': GeneralSettings.k1,
+            'K2': GeneralSettings.k2,
         }
 
         bess_asset2 = {
@@ -176,6 +247,8 @@ async def settings(data: dict):
             'reserveSoc': GeneralSettings.bess_reserve_soc2,
             'testData': original_test_data2,
             'vNom': GeneralSettings.bess_v_nom2,
+            'C1': GeneralSettings.C1,
+            'C2': GeneralSettings.C2,
         }
 
         milp_params = {
@@ -274,12 +347,12 @@ async def settings(data: dict):
     # remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
 
-
 @app.get("/api/get_data_for_chart")
 async def get_data_for_chart():
     technology = GeneralSettings.technology
     technology2 = GeneralSettings.technology2
     return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs, technology, technology2
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="127.0.0.1", port=8000)
+
+"""if __name__ == "__main__":
+     uvicorn.run(app, host="127.0.0.1", port=8000)"""

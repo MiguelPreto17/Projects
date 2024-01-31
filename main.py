@@ -61,12 +61,12 @@ def optimize(_settings, _assets, _assets2, _milp_params, _measures, _measures2, 
 
 	solve_t = time()
 	logger.info(f'Solving MILP ...')
-	problem.solve_milp(a)
+	problem.solve_milp(a, _assets, _assets2)
 	logger.info(f'Solving MILP ... OK! ({time() - solve_t:.3f}s)')
 
 	outputs_t = time()
 	logger.info(f'Generating outputs ...')
-	problem.generate_outputs(a)
+	problem.generate_outputs(a, _assets, _assets2 )
 	logger.info(f'Generating outputs ... OK! ({time() - outputs_t:.3f}s)')
 
 	return problem

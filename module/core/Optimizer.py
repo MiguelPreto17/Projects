@@ -9,13 +9,8 @@ from pulp import *
 from time import asctime
 from settings.general_settings import GeneralSettings
 
-
 seconds_in_min = 60
 minutes_in_hour = 60
-k1 = GeneralSettings.k1
-k2 = GeneralSettings.k2
-C1 = GeneralSettings.C1
-C2 = GeneralSettings.C2
 
 class Optimizer:
 	def __init__(self, plot=False, solver='CBC'):
@@ -122,14 +117,14 @@ class Optimizer:
 		#self.feedin_tariffs = forecasts.get('feedinTariffs')
 
 
-	def solve_milp(self, objective_function):
+	def solve_milp(self, objective_function, bess_asset, bess_asset2 ):
 		"""
 		Function that heads the definition and solution of the optimization problem.
 		:return: None
 		:rtype: None
 		"""
 		logger.debug(' - defining MILP')
-		self.milp = self.__define_milp(objective_function)
+		self.milp = self.__define_milp(objective_function, bess_asset, bess_asset2)
 
 		logger.debug(' - actually solving MILP')
 		# noinspection PyBroadException
@@ -146,7 +141,7 @@ class Optimizer:
 		self.stat = stat
 		self.opt_val = opt_val
 
-	def __define_milp(self, objective_function):
+	def __define_milp(self, objective_function, bess_asset, bess_asset2):
 		"""
 		Method to define the generic MILP problem.
 		:return: object with the milp problem ready for solving and easy access to all parameters, variables and results
@@ -157,6 +152,10 @@ class Optimizer:
 		# **************************************************************************************************************
 		T = self.time_series
 		S = self.seg_series
+		k1 = bess_asset['K1']
+		k2 = bess_asset['K2']
+		C1 = bess_asset2['C1']
+		C2 = bess_asset2['C2']
 		# To calculate the dynamic energy content limits, in kWh, a linearization was generated which is dependent on
 		# the charge/discharge current (kA) and not directly on the charge/discharge power (kW).
 		# Being so, we create a constant here that will
@@ -456,7 +455,7 @@ class Optimizer:
 
 		return self.milp
 
-	def generate_outputs(self, objective_function):
+	def generate_outputs(self, objective_function, bess_asset, bess_asset2):
 		"""
 		Function for generating the outputs of optimization, namely the set points for each asset and all relevant
 		variables, and to convert them into JSON format.
@@ -468,7 +467,7 @@ class Optimizer:
 			self.outputs = {}
 		else:
 			self.__get_variables_values()
-			self.__initialize_and_populate_outputs(objective_function)
+			self.__initialize_and_populate_outputs(objective_function, bess_asset, bess_asset2)
 
 		# Generate the outputs JSON file
 		master_path = os.path.abspath(os.path.join(__file__, '..', '..', '..'))
@@ -653,12 +652,17 @@ class Optimizer:
 
 					elif re.search(f'delta_bess_disch2_{s}_', v.name) and self.add_on_inv:
 						self.varis[f'delta_bess_disch2'][s][t] = v.varValue
-	def __initialize_and_populate_outputs(self, objective_function):
+	def __initialize_and_populate_outputs(self, objective_function, bess_asset, bess_asset2 ):
 		"""
 		Initializes and populates the outputs' structure as a dictionary matching the outputs JSON format.
 		:return: None
 		:rtype: None
 		"""
+		k1 = bess_asset['K1']
+		k2 = bess_asset['K2']
+		C1 = bess_asset2['C1']
+		C2 = bess_asset2 ['C2']
+
 		# Sum the variables p_ch and p_dis values across the different segments to obtain a single value per asset
 		# and per time step, in case add_on_inv is active
 		if not self.add_on_inv:
