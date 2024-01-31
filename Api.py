@@ -353,6 +353,5 @@ async def get_data_for_chart():
     technology2 = GeneralSettings.technology2
     return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs, technology, technology2
 
-
-"""if __name__ == "__main__":
-     uvicorn.run(app, host="127.0.0.1", port=8000)"""
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=8000)

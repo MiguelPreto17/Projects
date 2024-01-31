@@ -5,7 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: rest_api
-    restart: unless-stopped
+    networks:
+      - internetwork
+    # restart: unless-stopped
     ports:
       - "3006:3006"
     volumes:
