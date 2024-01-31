@@ -44,21 +44,21 @@ async def settings(data: dict):
     market = data.get("market", [])
     date = data.get("date", [])
 
-    Power = data.get("Power")
-    e_nom = data.get("Capacity")
+    Power = data.get("power")
+    e_nom = data.get("capacity")
     technology = data.get("technology")
     max_c_ch = Power / e_nom
     max_c_disch = Power / e_nom
-    bess_ch_eff = data.get("Eficiency")
-    bess_disch_eff = data.get("Eficiency")
+    bess_ch_eff = data.get("eficiency")
+    bess_disch_eff = data.get("eficiency")
 
-    Power2 = data.get("Power2")
-    e_nom2 = data.get("Capacity2")
+    Power2 = data.get("power2")
+    e_nom2 = data.get("capacity2")
     technology2 = data.get("technology2")
     max_c_ch2 = Power2 / e_nom2
     max_c_disch2= Power2 / e_nom2
-    bess_ch_eff2 = data.get("Eficiency2")
-    bess_disch_eff2= data.get("Eficiency2")
+    bess_ch_eff2 = data.get("eficiency2")
+    bess_disch_eff2= data.get("eficiency2")
 
     # Parametros
     objective_function = selected_option
