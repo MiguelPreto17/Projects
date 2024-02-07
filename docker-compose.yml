@@ -15,3 +15,7 @@ services:
     # environment:
     #   - FLASK_ENV=development
     #   - FLASK_APP=app.py
+networks:
+  internetwork:
+    name: internetwork
+    driver: bridge
