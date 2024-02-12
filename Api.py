@@ -31,11 +31,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/api/objective_function")
 async def objective_function(selected_option: str = Form(...)):
 
     objective_function = selected_option
     return objective_function
+
 
 @app.post("/api/settings")
 async def settings(data: dict):
@@ -56,9 +58,9 @@ async def settings(data: dict):
     e_nom2 = data.get("capacity2")
     technology2 = data.get("technology2")
     max_c_ch2 = Power2 / e_nom2
-    max_c_disch2= Power2 / e_nom2
+    max_c_disch2 = Power2 / e_nom2
     bess_ch_eff2 = data.get("eficiency2")
-    bess_disch_eff2= data.get("eficiency2")
+    bess_disch_eff2 = data.get("eficiency2")
 
     # Parametros
     objective_function = selected_option
@@ -84,7 +86,6 @@ async def settings(data: dict):
         GeneralSettings.k1 = 546
         GeneralSettings.C1 = 297
 
-    else:
         if technology == 2:
             GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Vanadium
             GeneralSettings.k1 = 307
@@ -115,12 +116,16 @@ async def settings(data: dict):
             GeneralSettings.k1 = 765
             GeneralSettings.C1 = 416
 
+    if technology2 == 0:
+        GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_lithium
+        GeneralSettings.k2 = 0
+        GeneralSettings.C2 = 0
+
     if technology2 == 1:
         GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_lithium
         GeneralSettings.k2 = 546
         GeneralSettings.C2 = 297
 
-    else:
         if technology2 == 2:
             GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_Vanadium
             GeneralSettings.k2 = 307
@@ -346,6 +351,7 @@ async def settings(data: dict):
     # Remove the log file handler
     # remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
+
 
 @app.get("/api/get_data_for_chart")
 async def get_data_for_chart():
