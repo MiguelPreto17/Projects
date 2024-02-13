@@ -303,18 +303,18 @@ async def settings(data: dict):
 
         status = prob_obj.stat
         logger.warning(f'{status}')
-        main.expected_revenues += pd.DataFrame(
+        main.expected_revenues = pd.DataFrame(
             outputs.get('expectRevs')).sum().get('setpoint')
-        main.last_soc += pd.DataFrame(outputs['eBess']
+        main.last_soc = pd.DataFrame(outputs['eBess']
+                                     ).loc[prob_obj.time_intervals - 1, 'setpoint']
+        main.last_soc2 = pd.DataFrame(outputs['eBess2']
                                       ).loc[prob_obj.time_intervals - 1, 'setpoint']
-        main.last_soc2 += pd.DataFrame(outputs['eBess2']
-                                       ).loc[prob_obj.time_intervals - 1, 'setpoint']
-        main.degradation += pd.DataFrame(outputs['eDeg']).sum().get('setpoint')
-        main.degradation2 += pd.DataFrame(
+        main.degradation = pd.DataFrame(outputs['eDeg']).sum().get('setpoint')
+        main.degradation2 = pd.DataFrame(
             outputs['eDeg2']).sum().get('setpoint')
-        main.total_degradation += pd.DataFrame(
+        main.total_degradation = pd.DataFrame(
             outputs.get('Totaldeg')).sum().get('setpoint')
-        main.total += pd.DataFrame(outputs.get('Total')).sum().get('setpoint')
+        main.total = pd.DataFrame(outputs.get('Total')).sum().get('setpoint')
         main.first_dt_text = dt.datetime.strftime(
             first_dt, '%Y-%m-%d %H:%M:%S')
 
