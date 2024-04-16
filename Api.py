@@ -8,6 +8,7 @@ from settings.general_settings import GeneralSettings
 from time import time
 from copy import deepcopy
 from helpers.set_loggers import *
+import uvicorn
 
 
 app = FastAPI(
@@ -51,6 +52,8 @@ async def settings(data: dict):
     max_c_disch = Power / e_nom
     bess_ch_eff = data.get("eficiency")
     bess_disch_eff = data.get("eficiency")
+    SOC_initial = data.get("SOC_initial")
+
 
     Power2 = data.get("power2")
     e_nom2 = data.get("capacity2")
@@ -58,7 +61,8 @@ async def settings(data: dict):
     max_c_ch2 = Power2 / e_nom2
     max_c_disch2= Power2 / e_nom2
     bess_ch_eff2 = data.get("eficiency2")
-    bess_disch_eff2= data.get("eficiency2")
+    bess_disch_eff2 = data.get("eficiency2")
+    SOC_initial2 = data.get("SOC_initial")
 
     # Parametros
     objective_function = selected_option
@@ -70,6 +74,7 @@ async def settings(data: dict):
     GeneralSettings.bess_ch_eff = bess_ch_eff
     GeneralSettings.bess_disch_eff = bess_disch_eff
     GeneralSettings.bess_inv_s_nom = max_c_ch * e_nom
+    GeneralSettings.bess_initial_soc = SOC_initial
 
     GeneralSettings.bess_max_c_ch2 = max_c_ch2
     GeneralSettings.bess_max_c_disch2 = max_c_disch2
@@ -78,6 +83,7 @@ async def settings(data: dict):
     GeneralSettings.bess_ch_eff2 = bess_ch_eff2
     GeneralSettings.bess_disch_eff2 = bess_disch_eff2
     GeneralSettings.bess_inv_s_nom2 = max_c_ch2 * e_nom2
+    GeneralSettings.bess_initial_soc = SOC_initial2
 
     if technology == 1:
         GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_lithium
@@ -298,18 +304,19 @@ async def settings(data: dict):
 
         status = prob_obj.stat
         logger.warning(f'{status}')
-        main.expected_revenues += pd.DataFrame(
+
+        main.expected_revenues = pd.DataFrame(
             outputs.get('expectRevs')).sum().get('setpoint')
-        main.last_soc += pd.DataFrame(outputs['eBess']
+        main.last_soc = pd.DataFrame(outputs['eBess']
                                       ).loc[prob_obj.time_intervals - 1, 'setpoint']
-        main.last_soc2 += pd.DataFrame(outputs['eBess2']
+        main.last_soc2 = pd.DataFrame(outputs['eBess2']
                                        ).loc[prob_obj.time_intervals - 1, 'setpoint']
-        main.degradation += pd.DataFrame(outputs['eDeg']).sum().get('setpoint')
-        main.degradation2 += pd.DataFrame(
+        main.degradation = pd.DataFrame(outputs['eDeg']).sum().get('setpoint')
+        main.degradation2 = pd.DataFrame(
             outputs['eDeg2']).sum().get('setpoint')
-        main.total_degradation += pd.DataFrame(
+        main.total_degradation = pd.DataFrame(
             outputs.get('Totaldeg')).sum().get('setpoint')
-        main.total += pd.DataFrame(outputs.get('Total')).sum().get('setpoint')
+        main.total = pd.DataFrame(outputs.get('Total')).sum().get('setpoint')
         main.first_dt_text = dt.datetime.strftime(
             first_dt, '%Y-%m-%d %H:%M:%S')
 
@@ -344,7 +351,7 @@ async def settings(data: dict):
                                             sep=';', decimal=',', index=True)
 
     # Remove the log file handler
-    # remove_logfile_handler(main.logfile_handler_id)
+    #remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
 
 @app.get("/api/get_data_for_chart")
@@ -353,5 +360,5 @@ async def get_data_for_chart():
     technology2 = GeneralSettings.technology2
     return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs, technology, technology2
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="127.0.0.1", port=8000)
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=3006)
