@@ -8,7 +8,6 @@ from settings.general_settings import GeneralSettings
 from time import time
 from copy import deepcopy
 from helpers.set_loggers import *
-import uvicorn
 
 
 app = FastAPI(
@@ -32,11 +31,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/api/objective_function")
 async def objective_function(selected_option: str = Form(...)):
 
     objective_function = selected_option
     return objective_function
+
 
 @app.post("/api/settings")
 async def settings(data: dict):
@@ -59,7 +60,7 @@ async def settings(data: dict):
     e_nom2 = data.get("capacity2")
     technology2 = data.get("technology2")
     max_c_ch2 = Power2 / e_nom2
-    max_c_disch2= Power2 / e_nom2
+    max_c_disch2 = Power2 / e_nom2
     bess_ch_eff2 = data.get("eficiency2")
     bess_disch_eff2 = data.get("eficiency2")
     SOC_initial2 = data.get("SOC_initial")
@@ -120,6 +121,11 @@ async def settings(data: dict):
             GeneralSettings.bess_deg_curve = GeneralSettings.bess_deg_curve_Supercaps
             GeneralSettings.k1 = 765
             GeneralSettings.C1 = 416
+
+    if technology2 == 0:
+        GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_lithium
+        GeneralSettings.k2 = 0
+        GeneralSettings.C2 = 0
 
     if technology2 == 1:
         GeneralSettings.bess_deg_curve2 = GeneralSettings.bess_deg_curve_lithium
@@ -304,13 +310,12 @@ async def settings(data: dict):
 
         status = prob_obj.stat
         logger.warning(f'{status}')
-
         main.expected_revenues = pd.DataFrame(
             outputs.get('expectRevs')).sum().get('setpoint')
         main.last_soc = pd.DataFrame(outputs['eBess']
-                                      ).loc[prob_obj.time_intervals - 1, 'setpoint']
+                                     ).loc[prob_obj.time_intervals - 1, 'setpoint']
         main.last_soc2 = pd.DataFrame(outputs['eBess2']
-                                       ).loc[prob_obj.time_intervals - 1, 'setpoint']
+                                      ).loc[prob_obj.time_intervals - 1, 'setpoint']
         main.degradation = pd.DataFrame(outputs['eDeg']).sum().get('setpoint')
         main.degradation2 = pd.DataFrame(
             outputs['eDeg2']).sum().get('setpoint')
@@ -351,8 +356,9 @@ async def settings(data: dict):
                                             sep=';', decimal=',', index=True)
 
     # Remove the log file handler
-    #remove_logfile_handler(main.logfile_handler_id)
+    # remove_logfile_handler(main.logfile_handler_id)
     return main.daily_outputs
+
 
 @app.get("/api/get_data_for_chart")
 async def get_data_for_chart():
@@ -360,5 +366,5 @@ async def get_data_for_chart():
     technology2 = GeneralSettings.technology2
     return main.daily_outputs['Merge'], main.daily_outputs['Merge2'], main.final_outputs, technology, technology2
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=3006)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=8000)
